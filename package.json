@@ -21,6 +21,7 @@
     "react-markdown": "^9.0.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.10.4",
     "@types/react": "^18.2.45",
