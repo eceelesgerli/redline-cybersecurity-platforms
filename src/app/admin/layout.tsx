@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation';
 import { getCurrentAdmin } from '@/lib/auth';
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminLoginForm from '@/components/admin/AdminLoginForm';
 
 export default async function AdminLayout({
   children,
@@ -10,7 +10,7 @@ export default async function AdminLayout({
   const admin = await getCurrentAdmin();
 
   if (!admin) {
-    redirect('/login');
+    return <AdminLoginForm />;
   }
 
   return (

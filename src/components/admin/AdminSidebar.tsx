@@ -34,7 +34,7 @@ export default function AdminSidebar({ admin }: AdminSidebarProps) {
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      router.push('/login');
+      router.push('/admin');
       router.refresh();
     } catch (error) {
       console.error('Logout error:', error);
