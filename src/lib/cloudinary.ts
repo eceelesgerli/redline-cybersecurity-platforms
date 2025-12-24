@@ -6,11 +6,26 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function uploadImage(file: string): Promise<{ url: string; publicId: string }> {
+export async function uploadImage(file: string, folder: string = 'redline-hero'): Promise<{ url: string; publicId: string }> {
   const result = await cloudinary.uploader.upload(file, {
-    folder: 'redline-hero',
+    folder,
     transformation: [
       { width: 800, height: 600, crop: 'fill' },
+      { quality: 'auto' },
+      { format: 'auto' },
+    ],
+  });
+
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
+  };
+}
+
+export async function uploadBlogImage(file: string): Promise<{ url: string; publicId: string }> {
+  const result = await cloudinary.uploader.upload(file, {
+    folder: 'redline-blogs',
+    transformation: [
       { quality: 'auto' },
       { format: 'auto' },
     ],

@@ -3,18 +3,46 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Save } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowLeft, Save, Upload, X } from 'lucide-react';
+import RichTextEditor from '@/components/admin/RichTextEditor';
 
 export default function NewBlogPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [coverImage, setCoverImage] = useState<string>('');
+  const [uploadingCover, setUploadingCover] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     excerpt: '',
     content: '',
     published: true,
   });
+
+  const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingCover(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      setCoverImage(data.url);
+    } catch (err) {
+      alert('Failed to upload cover image');
+    } finally {
+      setUploadingCover(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +53,7 @@ export default function NewBlogPage() {
       const res = await fetch('/api/blogs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, coverImage }),
       });
 
       const data = await res.json();
@@ -96,17 +124,56 @@ export default function NewBlogPage() {
           </div>
 
           <div>
-            <label htmlFor="content" className="block text-sm font-bold mb-2">
-              Content * (Markdown supported)
+            <label className="block text-sm font-bold mb-2">
+              Cover Image
             </label>
-            <textarea
-              id="content"
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+              {coverImage ? (
+                <div className="relative">
+                  <Image
+                    src={coverImage}
+                    alt="Cover"
+                    width={400}
+                    height={200}
+                    className="rounded-lg object-cover mx-auto"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setCoverImage('')}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className="cursor-pointer block text-center">
+                  <Upload className="w-12 h-12 mx-auto text-gray-400 mb-2" />
+                  <span className="text-gray-500">
+                    {uploadingCover ? 'Uploading...' : 'Click to upload cover image'}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCoverImageUpload}
+                    className="hidden"
+                    disabled={uploadingCover}
+                  />
+                </label>
+              )}
+            </div>
+            <p className="text-sm text-gray-500 mt-1">This image will appear at the top of your blog post</p>
+          </div>
+
+          <div>
+            <label htmlFor="content" className="block text-sm font-bold mb-2">
+              Content *
+            </label>
+            <RichTextEditor
               value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              className="input-field min-h-[400px] font-mono text-sm"
-              placeholder="Write your blog content here using Markdown..."
-              required
+              onChange={(value) => setFormData({ ...formData, content: value })}
+              placeholder="Write your blog content here..."
             />
+            <p className="text-sm text-gray-500 mt-1">Use the toolbar to format text, add images, change colors, and more</p>
           </div>
 
           <div className="flex items-center gap-3">

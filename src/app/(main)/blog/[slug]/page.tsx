@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
-import ReactMarkdown from 'react-markdown';
 import dbConnect from '@/lib/db';
 import Blog from '@/models/Blog';
 
@@ -13,6 +13,7 @@ interface BlogPost {
   slug: string;
   content: string;
   excerpt: string;
+  coverImage?: string;
   createdAt: string;
 }
 
@@ -87,9 +88,22 @@ export default async function BlogDetailPage({
           </div>
         </header>
 
-        <div className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-white prose-p:text-white prose-li:text-white prose-a:text-cyber-red prose-a:no-underline hover:prose-a:underline prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-cyber-black prose-pre:text-white prose-strong:text-white">
-          <ReactMarkdown>{blog.content}</ReactMarkdown>
-        </div>
+        {blog.coverImage && (
+          <div className="relative w-full h-[400px] mb-8 rounded-lg overflow-hidden">
+            <Image
+              src={blog.coverImage}
+              alt={blog.title}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        )}
+
+        <div 
+          className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-white prose-p:text-white prose-li:text-white prose-a:text-cyber-red prose-a:no-underline hover:prose-a:underline prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-cyber-black prose-pre:text-white prose-strong:text-white prose-img:rounded-lg prose-img:mx-auto"
+          dangerouslySetInnerHTML={{ __html: blog.content }}
+        />
 
         <footer className="mt-12 pt-8 border-t-2 border-cyber-black">
           <Link 
