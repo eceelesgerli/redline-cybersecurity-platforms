@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Save, Upload, X, Shield } from 'lucide-react';
+import { Save, Upload, X, Shield, AlertTriangle, Power } from 'lucide-react';
 
 interface SiteSettings {
   siteName: string;
   siteNameAccent: string;
   logoUrl?: string;
+  maintenanceMode: boolean;
+  maintenanceMessage: string;
 }
 
 export default function SettingsPage() {
@@ -15,6 +17,8 @@ export default function SettingsPage() {
     siteName: 'Red',
     siteNameAccent: 'Line',
     logoUrl: '',
+    maintenanceMode: false,
+    maintenanceMessage: 'Site şu anda bakım modundadır. Lütfen daha sonra tekrar deneyin.',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -34,6 +38,8 @@ export default function SettingsPage() {
           siteName: data.siteName || 'Red',
           siteNameAccent: data.siteNameAccent || 'Line',
           logoUrl: data.logoUrl || '',
+          maintenanceMode: data.maintenanceMode || false,
+          maintenanceMessage: data.maintenanceMessage || 'Site şu anda bakım modundadır. Lütfen daha sonra tekrar deneyin.',
         });
       }
     } catch (error) {
@@ -211,6 +217,61 @@ export default function SettingsPage() {
               </span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Maintenance Mode */}
+      <div className="card space-y-6">
+        <h2 className="text-lg font-bold border-b pb-2 flex items-center gap-2">
+          <AlertTriangle className="w-5 h-5 text-yellow-500" />
+          Maintenance Mode
+        </h2>
+
+        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div>
+            <h3 className="font-bold">Site Status</h3>
+            <p className="text-sm text-gray-500">
+              {settings.maintenanceMode 
+                ? 'Site is currently in maintenance mode. Visitors cannot access the site.' 
+                : 'Site is active and accessible to all visitors.'}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSettings({ ...settings, maintenanceMode: !settings.maintenanceMode })}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition-colors ${
+              settings.maintenanceMode
+                ? 'bg-green-500 hover:bg-green-600 text-white'
+                : 'bg-red-500 hover:bg-red-600 text-white'
+            }`}
+          >
+            <Power className="w-4 h-4" />
+            {settings.maintenanceMode ? 'Activate Site' : 'Enable Maintenance'}
+          </button>
+        </div>
+
+        {settings.maintenanceMode && (
+          <div className="p-4 bg-yellow-50 border-2 border-yellow-200 rounded-lg">
+            <p className="text-yellow-800 text-sm font-medium">
+              ⚠️ Warning: Maintenance mode is ON. Visitors will see the maintenance message instead of the site.
+            </p>
+          </div>
+        )}
+
+        <div>
+          <label htmlFor="maintenanceMessage" className="block text-sm font-bold mb-2">
+            Maintenance Message
+          </label>
+          <textarea
+            id="maintenanceMessage"
+            value={settings.maintenanceMessage}
+            onChange={(e) => setSettings({ ...settings, maintenanceMessage: e.target.value })}
+            className="input-field min-h-[100px]"
+            placeholder="Enter the message to show visitors during maintenance..."
+          />
+          <p className="text-sm text-gray-500 mt-1">
+            This message will be displayed to visitors when maintenance mode is enabled.
+          </p>
         </div>
       </div>
     </div>
