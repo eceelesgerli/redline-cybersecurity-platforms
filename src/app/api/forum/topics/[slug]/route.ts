@@ -25,7 +25,8 @@ export async function GET(
     }
 
     // Get replies
-    const replies = await ForumReply.find({ topic: topic._id })
+    const topicId = (topic as any)._id;
+    const replies = await ForumReply.find({ topic: topicId })
       .populate('author', 'username rank avatar')
       .sort({ createdAt: 1 })
       .lean();
