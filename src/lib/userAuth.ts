@@ -19,11 +19,12 @@ export async function getCurrentUser() {
     
     if (!user) return null;
 
-    const rankInfo = RANKS.find(r => r.level === user.rank) || RANKS[0];
+    const userData = user as any;
+    const rankInfo = RANKS.find(r => r.level === userData.rank) || RANKS[0];
 
     return {
-      ...user,
-      _id: user._id.toString(),
+      ...userData,
+      _id: userData._id.toString(),
       rankName: rankInfo.name,
       rankEmoji: rankInfo.emoji,
     };
