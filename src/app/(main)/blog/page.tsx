@@ -38,9 +38,9 @@ async function getHeroSlides() {
 async function getSiteSettings() {
   try {
     await dbConnect();
-    let settings = await SiteSettings.findOne().lean();
+    const settings = await SiteSettings.findOne().lean();
     if (!settings) {
-      settings = { siteName: 'Red', siteNameAccent: 'Line', logoUrl: '' };
+      return { siteName: 'Red', siteNameAccent: 'Line', logoUrl: '' };
     }
     return JSON.parse(JSON.stringify(settings));
   } catch (error) {
