@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import Hero from '@/components/Hero';
 import BlogCard from '@/components/BlogCard';
+import dbConnect from '@/lib/db';
+import Blog from '@/models/Blog';
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -9,14 +11,11 @@ export const metadata: Metadata = {
 
 async function getBlogs() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/blogs?published=true&limit=50`, {
-      cache: 'no-store',
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.blogs || [];
-  } catch {
+    await dbConnect();
+    const blogs = await Blog.find({ published: true }).sort({ createdAt: -1 }).limit(50).lean();
+    return JSON.parse(JSON.stringify(blogs));
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
     return [];
   }
 }

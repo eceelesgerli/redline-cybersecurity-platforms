@@ -3,45 +3,40 @@ import BlogCard from '@/components/BlogCard';
 import ToolCard from '@/components/ToolCard';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import dbConnect from '@/lib/db';
+import HeroSlide from '@/models/HeroSlide';
+import Blog from '@/models/Blog';
+import Tool from '@/models/Tool';
 
 async function getHeroSlides() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/hero-slides`, {
-      cache: 'no-store',
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.slides || [];
-  } catch {
+    await dbConnect();
+    const slides = await HeroSlide.find({ isActive: true }).sort({ order: 1 }).lean();
+    return JSON.parse(JSON.stringify(slides));
+  } catch (error) {
+    console.error('Error fetching hero slides:', error);
     return [];
   }
 }
 
 async function getLatestBlogs() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/blogs?limit=3&published=true`, {
-      cache: 'no-store',
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.blogs || [];
-  } catch {
+    await dbConnect();
+    const blogs = await Blog.find({ published: true }).sort({ createdAt: -1 }).limit(3).lean();
+    return JSON.parse(JSON.stringify(blogs));
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
     return [];
   }
 }
 
 async function getLatestTools() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/tools?limit=3`, {
-      cache: 'no-store',
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.tools || [];
-  } catch {
+    await dbConnect();
+    const tools = await Tool.find({}).sort({ createdAt: -1 }).limit(3).lean();
+    return JSON.parse(JSON.stringify(tools));
+  } catch (error) {
+    console.error('Error fetching tools:', error);
     return [];
   }
 }

@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import Hero from '@/components/Hero';
 import ToolCard from '@/components/ToolCard';
+import dbConnect from '@/lib/db';
+import Tool from '@/models/Tool';
 
 export const metadata: Metadata = {
   title: 'Tools',
@@ -22,14 +24,11 @@ const categories = [
 
 async function getTools() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/tools?limit=50`, {
-      cache: 'no-store',
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.tools || [];
-  } catch {
+    await dbConnect();
+    const tools = await Tool.find({}).sort({ createdAt: -1 }).limit(50).lean();
+    return JSON.parse(JSON.stringify(tools));
+  } catch (error) {
+    console.error('Error fetching tools:', error);
     return [];
   }
 }
