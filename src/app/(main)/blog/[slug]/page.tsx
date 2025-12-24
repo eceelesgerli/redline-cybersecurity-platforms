@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
+import dbConnect from '@/lib/db';
+import Blog from '@/models/Blog';
 
 interface BlogPost {
   _id: string;
@@ -16,14 +18,12 @@ interface BlogPost {
 
 async function getBlog(slug: string): Promise<BlogPost | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/blogs/slug/${slug}`, {
-      cache: 'no-store',
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.blog;
-  } catch {
+    await dbConnect();
+    const blog = await Blog.findOne({ slug, published: true }).lean();
+    if (!blog) return null;
+    return JSON.parse(JSON.stringify(blog));
+  } catch (error) {
+    console.error('Error fetching blog:', error);
     return null;
   }
 }
