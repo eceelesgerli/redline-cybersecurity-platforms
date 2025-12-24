@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill-new/dist/quill.snow.css';
 
@@ -16,65 +16,28 @@ interface RichTextEditorProps {
 }
 
 export default function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
-  const quillRef = useRef<any>(null);
+  const [editorHtml, setEditorHtml] = useState(value);
 
-  const imageHandler = () => {
-    const input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
-    input.click();
+  const handleChange = useCallback((content: string) => {
+    setEditorHtml(content);
+    onChange(content);
+  }, [onChange]);
 
-    input.onchange = async () => {
-      const file = input.files?.[0];
-      if (!file) return;
-
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!res.ok) {
-          throw new Error('Upload failed');
-        }
-
-        const data = await res.json();
-        const quill = quillRef.current?.getEditor();
-        if (quill) {
-          const range = quill.getSelection(true);
-          quill.insertEmbed(range.index, 'image', data.url);
-          quill.setSelection(range.index + 1);
-        }
-      } catch (error) {
-        console.error('Error uploading image:', error);
-        alert('Failed to upload image. Please try again.');
-      }
-    };
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'font': [] }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'indent': '-1' }, { 'indent': '+1' }],
+      [{ 'align': [] }],
+      ['link', 'image', 'video'],
+      ['blockquote', 'code-block'],
+      ['clean'],
+    ],
   };
-
-  const modules = useMemo(() => ({
-    toolbar: {
-      container: [
-        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-        [{ 'font': [] }],
-        [{ 'size': ['small', false, 'large', 'huge'] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ 'color': [] }, { 'background': [] }],
-        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-        [{ 'indent': '-1' }, { 'indent': '+1' }],
-        [{ 'align': [] }],
-        ['link', 'image', 'video'],
-        ['blockquote', 'code-block'],
-        ['clean'],
-      ],
-      handlers: {
-        image: imageHandler,
-      },
-    },
-  }), []);
 
   const formats = [
     'header', 'font', 'size',
@@ -89,10 +52,9 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
   return (
     <div className="rich-text-editor">
       <ReactQuill
-        ref={quillRef}
         theme="snow"
-        value={value}
-        onChange={onChange}
+        value={editorHtml}
+        onChange={handleChange}
         modules={modules}
         formats={formats}
         placeholder={placeholder}
