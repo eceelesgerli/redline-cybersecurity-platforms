@@ -11,7 +11,8 @@ import {
   Home,
   User,
   Image,
-  Settings
+  Settings,
+  Users
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -26,6 +27,7 @@ const menuItems = [
   { href: '/admin/hero-slides', icon: Image, label: 'Hero Slides' },
   { href: '/admin/blogs', icon: FileText, label: 'Blog Posts' },
   { href: '/admin/tools', icon: Wrench, label: 'Tools' },
+  { href: '/admin/users', icon: Users, label: 'Users' },
   { href: '/admin/settings', icon: Settings, label: 'Site Settings' },
 ];
 
