@@ -8,6 +8,8 @@ import HeroSlide from '@/models/HeroSlide';
 import Blog from '@/models/Blog';
 import Tool from '@/models/Tool';
 
+export const revalidate = 0;
+
 async function getHeroSlides() {
   try {
     await dbConnect();

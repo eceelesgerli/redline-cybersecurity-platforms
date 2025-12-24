@@ -5,6 +5,8 @@ import dbConnect from '@/lib/db';
 import Tool from '@/models/Tool';
 import HeroSlide from '@/models/HeroSlide';
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: 'Tools',
   description: 'Explore our curated collection of web penetration testing tools and cybersecurity resources.',

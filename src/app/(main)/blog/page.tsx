@@ -5,6 +5,8 @@ import dbConnect from '@/lib/db';
 import Blog from '@/models/Blog';
 import HeroSlide from '@/models/HeroSlide';
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: 'Blog',
   description: 'Read the latest cybersecurity articles, tutorials, and insights from RedLine.',

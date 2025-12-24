@@ -7,6 +7,8 @@ import { formatDate } from '@/lib/utils';
 import dbConnect from '@/lib/db';
 import Blog from '@/models/Blog';
 
+export const revalidate = 0;
+
 interface BlogPost {
   _id: string;
   title: string;
