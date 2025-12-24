@@ -3,6 +3,7 @@ import Hero from '@/components/Hero';
 import BlogCard from '@/components/BlogCard';
 import dbConnect from '@/lib/db';
 import Blog from '@/models/Blog';
+import HeroSlide from '@/models/HeroSlide';
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -20,12 +21,23 @@ async function getBlogs() {
   }
 }
 
+async function getHeroSlides() {
+  try {
+    await dbConnect();
+    const slides = await HeroSlide.find({ isActive: true }).sort({ order: 1 }).lean();
+    return JSON.parse(JSON.stringify(slides));
+  } catch (error) {
+    console.error('Error fetching hero slides:', error);
+    return [];
+  }
+}
+
 export default async function BlogPage() {
-  const blogs = await getBlogs();
+  const [blogs, slides] = await Promise.all([getBlogs(), getHeroSlides()]);
 
   return (
     <>
-      <Hero title="Blog" subtitle="Explore cybersecurity insights, tutorials, and the latest in web security." />
+      <Hero title="Blog" subtitle="Explore cybersecurity insights, tutorials, and the latest in web security." slides={slides} />
 
       <section className="py-16 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

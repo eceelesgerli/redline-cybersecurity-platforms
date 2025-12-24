@@ -3,6 +3,7 @@ import Hero from '@/components/Hero';
 import ToolCard from '@/components/ToolCard';
 import dbConnect from '@/lib/db';
 import Tool from '@/models/Tool';
+import HeroSlide from '@/models/HeroSlide';
 
 export const metadata: Metadata = {
   title: 'Tools',
@@ -33,12 +34,23 @@ async function getTools() {
   }
 }
 
+async function getHeroSlides() {
+  try {
+    await dbConnect();
+    const slides = await HeroSlide.find({ isActive: true }).sort({ order: 1 }).lean();
+    return JSON.parse(JSON.stringify(slides));
+  } catch (error) {
+    console.error('Error fetching hero slides:', error);
+    return [];
+  }
+}
+
 export default async function ToolsPage() {
-  const tools = await getTools();
+  const [tools, slides] = await Promise.all([getTools(), getHeroSlides()]);
 
   return (
     <>
-      <Hero title="Tools" subtitle="Curated collection of web penetration testing tools and cybersecurity resources." />
+      <Hero title="Tools" subtitle="Curated collection of web penetration testing tools and cybersecurity resources." slides={slides} />
 
       <section className="py-16 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
