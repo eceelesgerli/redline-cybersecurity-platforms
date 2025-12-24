@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X, Shield } from 'lucide-react';
 
 const navLinks = [
@@ -12,9 +13,31 @@ const navLinks = [
   { href: '/login', label: 'Login' },
 ];
 
+interface SiteSettings {
+  siteName: string;
+  siteNameAccent: string;
+  logoUrl?: string;
+}
+
 export default function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [settings, setSettings] = useState<SiteSettings>({
+    siteName: 'Red',
+    siteNameAccent: 'Line',
+    logoUrl: '',
+  });
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.siteName) {
+          setSettings(data);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -31,9 +54,19 @@ export default function Header() {
           <div className="flex justify-between items-center relative">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
-              <Shield className="w-8 h-8 text-cyber-red group-hover:scale-110 transition-transform" />
+              {settings.logoUrl ? (
+                <Image
+                  src={settings.logoUrl}
+                  alt="Logo"
+                  width={32}
+                  height={32}
+                  className="group-hover:scale-110 transition-transform object-contain"
+                />
+              ) : (
+                <Shield className="w-8 h-8 text-cyber-red group-hover:scale-110 transition-transform" />
+              )}
               <span className="text-2xl font-black tracking-tight text-white">
-                Red<span className="text-cyber-red">Line</span>
+                {settings.siteName}<span className="text-cyber-red">{settings.siteNameAccent}</span>
               </span>
             </Link>
 

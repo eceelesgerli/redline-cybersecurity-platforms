@@ -10,7 +10,8 @@ import {
   LogOut, 
   Home,
   User,
-  Image
+  Image,
+  Settings
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -25,6 +26,7 @@ const menuItems = [
   { href: '/admin/hero-slides', icon: Image, label: 'Hero Slides' },
   { href: '/admin/blogs', icon: FileText, label: 'Blog Posts' },
   { href: '/admin/tools', icon: Wrench, label: 'Tools' },
+  { href: '/admin/settings', icon: Settings, label: 'Site Settings' },
 ];
 
 export default function AdminSidebar({ admin }: AdminSidebarProps) {

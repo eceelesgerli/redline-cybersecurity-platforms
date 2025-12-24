@@ -1,4 +1,5 @@
 import { Shield } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import HeroCarousel from './HeroCarousel';
 
@@ -8,14 +9,23 @@ interface Slide {
   title?: string;
 }
 
+interface SiteSettings {
+  siteName: string;
+  siteNameAccent: string;
+  logoUrl?: string;
+}
+
 interface HeroProps {
   title?: string;
   subtitle?: string;
   showCTA?: boolean;
   slides?: Slide[];
+  siteSettings?: SiteSettings;
 }
 
-export default function Hero({ title = 'Home', subtitle, showCTA = false, slides = [] }: HeroProps) {
+export default function Hero({ title = 'Home', subtitle, showCTA = false, slides = [], siteSettings }: HeroProps) {
+  const settings = siteSettings || { siteName: 'Red', siteNameAccent: 'Line', logoUrl: '' };
+  
   return (
     <section className="bg-transparent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,9 +36,19 @@ export default function Hero({ title = 'Home', subtitle, showCTA = false, slides
 
           <div className="flex flex-col justify-center order-1 lg:order-2">
             <div className="flex items-center gap-3 mb-4">
-              <Shield className="w-12 h-12 text-cyber-red" />
+              {settings.logoUrl ? (
+                <Image
+                  src={settings.logoUrl}
+                  alt="Logo"
+                  width={48}
+                  height={48}
+                  className="object-contain"
+                />
+              ) : (
+                <Shield className="w-12 h-12 text-cyber-red" />
+              )}
               <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-white">
-                Red<span className="text-cyber-red">Line</span>
+                {settings.siteName}<span className="text-cyber-red">{settings.siteNameAccent}</span>
               </h1>
             </div>
             {subtitle && (

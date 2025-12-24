@@ -4,6 +4,7 @@ import ToolCard from '@/components/ToolCard';
 import dbConnect from '@/lib/db';
 import Tool from '@/models/Tool';
 import HeroSlide from '@/models/HeroSlide';
+import SiteSettings from '@/models/SiteSettings';
 
 export const revalidate = 0;
 
@@ -47,12 +48,25 @@ async function getHeroSlides() {
   }
 }
 
+async function getSiteSettings() {
+  try {
+    await dbConnect();
+    let settings = await SiteSettings.findOne().lean();
+    if (!settings) {
+      settings = { siteName: 'Red', siteNameAccent: 'Line', logoUrl: '' };
+    }
+    return JSON.parse(JSON.stringify(settings));
+  } catch (error) {
+    return { siteName: 'Red', siteNameAccent: 'Line', logoUrl: '' };
+  }
+}
+
 export default async function ToolsPage() {
-  const [tools, slides] = await Promise.all([getTools(), getHeroSlides()]);
+  const [tools, slides, siteSettings] = await Promise.all([getTools(), getHeroSlides(), getSiteSettings()]);
 
   return (
     <>
-      <Hero title="Tools" subtitle="Curated collection of web penetration testing tools and cybersecurity resources." slides={slides} />
+      <Hero title="Tools" subtitle="Curated collection of web penetration testing tools and cybersecurity resources." slides={slides} siteSettings={siteSettings} />
 
       <section className="py-16 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

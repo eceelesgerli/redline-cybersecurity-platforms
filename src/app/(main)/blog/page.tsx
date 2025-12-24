@@ -4,6 +4,7 @@ import BlogCard from '@/components/BlogCard';
 import dbConnect from '@/lib/db';
 import Blog from '@/models/Blog';
 import HeroSlide from '@/models/HeroSlide';
+import SiteSettings from '@/models/SiteSettings';
 
 export const revalidate = 0;
 
@@ -34,12 +35,25 @@ async function getHeroSlides() {
   }
 }
 
+async function getSiteSettings() {
+  try {
+    await dbConnect();
+    let settings = await SiteSettings.findOne().lean();
+    if (!settings) {
+      settings = { siteName: 'Red', siteNameAccent: 'Line', logoUrl: '' };
+    }
+    return JSON.parse(JSON.stringify(settings));
+  } catch (error) {
+    return { siteName: 'Red', siteNameAccent: 'Line', logoUrl: '' };
+  }
+}
+
 export default async function BlogPage() {
-  const [blogs, slides] = await Promise.all([getBlogs(), getHeroSlides()]);
+  const [blogs, slides, siteSettings] = await Promise.all([getBlogs(), getHeroSlides(), getSiteSettings()]);
 
   return (
     <>
-      <Hero title="Blog" subtitle="Explore cybersecurity insights, tutorials, and the latest in web security." slides={slides} />
+      <Hero title="Blog" subtitle="Explore cybersecurity insights, tutorials, and the latest in web security." slides={slides} siteSettings={siteSettings} />
 
       <section className="py-16 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

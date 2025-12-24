@@ -7,6 +7,7 @@ import dbConnect from '@/lib/db';
 import HeroSlide from '@/models/HeroSlide';
 import Blog from '@/models/Blog';
 import Tool from '@/models/Tool';
+import SiteSettings from '@/models/SiteSettings';
 
 export const revalidate = 0;
 
@@ -43,11 +44,26 @@ async function getLatestTools() {
   }
 }
 
+async function getSiteSettings() {
+  try {
+    await dbConnect();
+    let settings = await SiteSettings.findOne().lean();
+    if (!settings) {
+      settings = { siteName: 'Red', siteNameAccent: 'Line', logoUrl: '' };
+    }
+    return JSON.parse(JSON.stringify(settings));
+  } catch (error) {
+    console.error('Error fetching site settings:', error);
+    return { siteName: 'Red', siteNameAccent: 'Line', logoUrl: '' };
+  }
+}
+
 export default async function HomePage() {
-  const [blogs, tools, slides] = await Promise.all([
+  const [blogs, tools, slides, siteSettings] = await Promise.all([
     getLatestBlogs(),
     getLatestTools(),
     getHeroSlides(),
+    getSiteSettings(),
   ]);
 
   return (
@@ -57,6 +73,7 @@ export default async function HomePage() {
         subtitle="Your gateway to cybersecurity knowledge and penetration testing tools. Stay ahead of threats with our latest insights and resources."
         showCTA={true}
         slides={slides}
+        siteSettings={siteSettings}
       />
 
       <section className="py-16 bg-transparent">
